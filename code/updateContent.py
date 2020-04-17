@@ -22,6 +22,7 @@ session = DBSession()
 userInput = input("Enter item name : ")
 count = 0
 t = PrettyTable(['ID','Name','Description','Restaurant Name','Price'])
+
 findResult = session.query(MenuItem).filter_by(name=userInput)  # We can find all rows that contains the given value
 # in the selected column
 
@@ -30,19 +31,29 @@ for each in findResult:
 
 if count > 1:
     for item in findResult:
-        # print("ID : {0} / Item : {1} / Restaurant : {3} / Description : {2} / Price : {4}".format(each.id,
-        #                                          each.name, each.description, each.restaurant.name, each.price))
         t.add_row([item.id, item.name, item.description, item.restaurant.name, item.price])
     print(t)
-    idInput = int(input("Enter the ID of the item : "))
-    findResult = session.query(MenuItem).filter_by(id=idInput).one()  # When it comes to only one row that could exist
-    # in the table with the given parameters, then we can use one() to get that row directly
-    newPrice = input("Enter the new price : ")
-    findResult.price = newPrice  # updating the value
-    session.add(findResult)
-    session.commit()
-    print("Updated")
-    print("ID : {0} / Item : {1} / Restaurant : {3} / Description : {2} / Price : {4}".format(findResult.id,
+    temp = input("Do you want to update one ar all - Enter one or all : ")
+    if temp == "all":
+        newPrice = input("Enter the new price : ")
+        for each in findResult:
+            each.price = newPrice
+            session.add(each)
+            session.commit()
+        print("Updated")
+        for i in findResult:
+            print("ID : {0} / Item : {1} / Restaurant : {3} / Description : {2} / Price : {4}".format(i.id,
+               i.name, i.description, i.restaurant.name, i.price))
+    else:
+        idInput = int(input("Enter the ID of the item : "))
+        findResult = session.query(MenuItem).filter_by(id=idInput).one()  # When it comes to only one
+        # row that could exist in the table with the given parameters, then we can use one() to get that row directly
+        newPrice = input("Enter the new price : ")
+        findResult.price = newPrice  # updating the value
+        session.add(findResult)
+        session.commit()
+        print("Updated")
+        print("ID : {0} / Item : {1} / Restaurant : {3} / Description : {2} / Price : {4}".format(findResult.id,
           findResult.name, findResult.description, findResult.restaurant.name, findResult.price))
 elif count == 1:
     findResult = session.query(MenuItem).filter_by(name=userInput).one()
